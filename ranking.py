@@ -6,9 +6,8 @@ results from search in this file, you can just take the first 10 results. For se
 """
 
 import json
-import re
 import typing
-
+import re
 
 def final(query: str, title: str, document: str) -> int:
     point = 0
@@ -47,42 +46,29 @@ def final(query: str, title: str, document: str) -> int:
 
     return point
 
-
-def term_count(query: str, document: str) -> int:
-    count = 0
-    query_terms = query.lower().split()
-    document_terms = document.lower().split()
-    for query_term in query_terms:
-        for document_term in document_terms:
-            if query_term == document_term:
-                count += 1
-    return count
-
-
-def boolean_term_count(query: str, document: str) -> int:
-    count = 0
-    query_terms = query.lower().split()
-    document_terms = document.lower().split()
-    for term in query_terms:
-        if term in document_terms:
-            count += 1
-    return count
-
-
-def search(query: str, documents: typing.List[str]) -> typing.List[str]:
+def search(query: str, ti: typing.List[str], documents: typing.List[str]):
     counts = dict()
     for i, doc in enumerate(documents):
-        counts[i] = term_count(query=query, document=doc)
+        counts[i] = final(query=query, title=ti[i], document=doc)
+    print(counts)
     indexes = sorted(range(len(documents)), key=counts.get, reverse=True)
-    return [documents[i] for i in indexes]
-
+    print(indexes)
+    an_doc = [documents[i] for i in indexes]
+    an_ti = [ti[i] for i in indexes]
+    for i in range(10):
+        print(str(i+1) + ") Title: " + an_ti[i] )
+        print("Document: " + an_doc[i])
+        print("----------------------------")
+        print()
 
 def run_search():
-    with open(r'C:\Users\Alex\Documents\DePaul\datasets\wiki_small\wiki_small.json') as fp:
+    with open(r'F:\Depaul\Search Engine\main\test.json') as fp:
         data = json.load(fp)
-
     documents = [record['init_text'] for record in data]
+    title = [record['title'] for record in data]
     query = input("Please enter a query:")
     while query:
-        print(search(query, documents))
-        query = input("Please enter a query:")
+        (search(query, title, documents))
+        query = input("Please enter a query (!!! for quit):")
+        if query == "!!!":
+            break
